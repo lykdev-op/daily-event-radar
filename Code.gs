@@ -96,8 +96,13 @@ function searchForwardedThreads() {
   cutoff.setDate(cutoff.getDate() - GMAIL_SEARCH_DAYS);
   const dateStr = Utilities.formatDate(cutoff, 'UTC', 'yyyy/MM/dd');
 
-  // Catch "Fwd:", "FW:", "Fw:" subject prefixes; search all mail
-  const query = `(subject:Fwd OR subject:FW OR subject:Fw) after:${dateStr}`;
+  // Only scan forwarded emails from specific trusted senders
+  const SENDERS = [
+    'helenlee.lyk@gmail.com',
+  ];
+
+  const fromClause = SENDERS.map(s => `from:${s}`).join(' OR ');
+  const query = `(${fromClause}) (subject:Fwd OR subject:FW OR subject:Fw) after:${dateStr}`;
   return GmailApp.search(query, 0, 50);
 }
 

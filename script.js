@@ -9,59 +9,6 @@ const API = {
   submitRatings: APPS_SCRIPT_URL,           // POST → doPost()
 };
 
-// Fallback sample data for offline development / demo
-const SAMPLE_EVENTS = [
-  {
-    id: 'evt-001',
-    title: 'AI in Healthcare Summit 2026',
-    org: 'MedTech Alliance',
-    date: '2026-05-14',
-    tags: ['AI', 'Healthcare', 'Summit'],
-    ai_score: 5,
-    ai_reason: 'Directly aligns with your interest in AI applications and healthcare innovation. Keynote includes case studies from three leading hospital networks.',
-    link: 'https://example.com/ai-health-summit',
-  },
-  {
-    id: 'evt-002',
-    title: 'Open Source Security Conference',
-    org: 'Linux Foundation',
-    date: '2026-05-20',
-    tags: ['Security', 'Open Source', 'DevOps'],
-    ai_score: 4,
-    ai_reason: 'Strong overlap with software engineering and security topics you\'ve engaged with recently. Includes a workshop on supply-chain security.',
-    link: 'https://example.com/oss-security',
-  },
-  {
-    id: 'evt-003',
-    title: 'Product-Led Growth Masterclass',
-    org: 'Reforge',
-    date: '2026-05-22',
-    tags: ['Product', 'Growth', 'SaaS'],
-    ai_score: 4,
-    ai_reason: 'Matches your product strategy interests. Covers activation loops and retention frameworks used by top SaaS companies.',
-    link: 'https://example.com/plg-masterclass',
-  },
-  {
-    id: 'evt-004',
-    title: 'Generative Art & Creative Coding Workshop',
-    org: 'Creative Code NYC',
-    date: '2026-05-18',
-    tags: ['Creative', 'Generative AI', 'Art'],
-    ai_score: 2,
-    ai_reason: 'Exploratory pick — adjacent to your technical background but outside your usual domain. Useful for broadening perspective on creative AI use cases.',
-    link: 'https://example.com/genart-workshop',
-  },
-  {
-    id: 'evt-005',
-    title: 'Climate Tech Investor Briefing',
-    org: 'GreenVC Network',
-    date: '2026-05-25',
-    tags: ['Climate', 'Investment', 'Startups'],
-    ai_score: 2,
-    ai_reason: 'Low-signal exploratory event. Included to surface emerging trends outside your current focus area that may become relevant.',
-    link: 'https://example.com/climate-vc',
-  },
-];
 
 // ─── State ────────────────────────────────────────────────────────────────────
 
@@ -74,6 +21,7 @@ const $loading     = document.getElementById('loading');
 const $error       = document.getElementById('error');
 const $errorMsg    = document.getElementById('error-message');
 const $retryBtn    = document.getElementById('retry-btn');
+const $empty       = document.getElementById('empty');
 const $eventsList  = document.getElementById('events-list');
 const $submitSect  = document.getElementById('submit-section');
 const $submitBtn   = document.getElementById('submit-btn');
@@ -92,6 +40,7 @@ loadEvents();
 async function loadEvents() {
   show($loading);
   hide($error);
+  hide($empty);
   hide($eventsList);
   hide($submitSect);
 
@@ -102,18 +51,17 @@ async function loadEvents() {
     if (!res.ok) throw new Error(`Server returned ${res.status}`);
     events = await res.json();
   } catch (err) {
-    // In production remove the fallback and surface the error.
-    // For local development, fall through to sample data.
-    if (location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.protocol === 'file:') {
-      console.warn('API unavailable — using sample data for development.', err.message);
-      events = SAMPLE_EVENTS;
-    } else {
-      showError('Could not load today\'s events. Check your connection and try again.');
-      return;
-    }
+    showError('Could not load today\'s events. Check your connection and try again.');
+    return;
   }
 
   hide($loading);
+
+  if (!events || events.length === 0) {
+    show($empty);
+    return;
+  }
+
   renderEvents(events);
 }
 
