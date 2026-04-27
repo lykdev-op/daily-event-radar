@@ -2,7 +2,7 @@
 
 // Replace APPS_SCRIPT_URL with your deployed web app URL from:
 // Apps Script editor → Deploy → New deployment → Web app → Copy URL
-const APPS_SCRIPT_URL = 'YOUR_APPS_SCRIPT_DEPLOYMENT_URL_HERE';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxyTLeSlw7Xoqth_pYQPrM5CChAaZVKoVycFymbJLAQmJNJT_urwTtFftsQ7nGFcunAGA/exec';
 
 const API = {
   getEvents:     APPS_SCRIPT_URL,           // GET  → doGet()
