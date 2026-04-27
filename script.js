@@ -1,8 +1,12 @@
 // ─── Config ──────────────────────────────────────────────────────────────────
 
+// Replace APPS_SCRIPT_URL with your deployed web app URL from:
+// Apps Script editor → Deploy → New deployment → Web app → Copy URL
+const APPS_SCRIPT_URL = 'YOUR_APPS_SCRIPT_DEPLOYMENT_URL_HERE';
+
 const API = {
-  getEvents: '/get-daily-events',
-  submitRatings: '/submit-ratings',
+  getEvents:     APPS_SCRIPT_URL,           // GET  → doGet()
+  submitRatings: APPS_SCRIPT_URL,           // POST → doPost()
 };
 
 // Fallback sample data for offline development / demo
@@ -94,7 +98,7 @@ async function loadEvents() {
   let events;
 
   try {
-    const res = await fetch(API.getEvents);
+    const res = await fetch(API.getEvents, { redirect: 'follow' });
     if (!res.ok) throw new Error(`Server returned ${res.status}`);
     events = await res.json();
   } catch (err) {
