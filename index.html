@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daily Event Radar</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <header>
+    <h1>Daily Event Radar</h1>
+    <p class="subtitle">5 events. Fast decisions.</p>
+  </header>
+
+  <main id="main">
+    <!-- Loading state -->
+    <div id="loading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Fetching today's events…</p>
+    </div>
+
+    <!-- Error state -->
+    <div id="error" class="error-state hidden">
+      <p id="error-message">Failed to load events.</p>
+      <button id="retry-btn" class="btn-secondary">Retry</button>
+    </div>
+
+    <!-- Event cards injected here -->
+    <div id="events-list" class="events-list hidden"></div>
+
+    <!-- Submit section -->
+    <div id="submit-section" class="submit-section hidden">
+      <button id="submit-btn" class="btn-primary" disabled>
+        Submit Today's Ratings
+      </button>
+      <p class="submit-hint" id="submit-hint">Rate all 5 events to submit.</p>
+    </div>
+
+    <!-- Confirmation -->
+    <div id="confirmation" class="confirmation hidden">
+      <div class="confirmation-inner">
+        <span class="check-icon">✓</span>
+        <h2>Ratings submitted</h2>
+        <p>Thanks — your feedback helps improve tomorrow's radar.</p>
+      </div>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
