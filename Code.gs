@@ -294,6 +294,7 @@ function writeEventRow(sheet, id, raw, analysis) {
  * MAX_EVENTS_SHOWN highest-scoring un-reviewed events as TRUE.
  */
 function refreshShownTodayFlags(sheet) {
+  if (!sheet) sheet = getOrCreateSheet();
   const lastRow = sheet.getLastRow();
   if (lastRow < 2) return;
 
