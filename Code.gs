@@ -3,6 +3,7 @@
 // Google Sheet. Set CLAUDE_API_KEY in Project Settings > Script Properties.
 
 const SHEET_NAME = 'Events';
+const SPREADSHEET_ID = '';   // ← paste your Google Sheet ID here (from its URL)
 const OPENAI_MODEL = 'gpt-4o';
 const GMAIL_SEARCH_DAYS = 1;   // how many days back to scan for forwarded emails
 const MAX_EVENTS_SHOWN = 5;    // top N events to surface to the UI each day
@@ -75,7 +76,12 @@ function fetchAndProcessEmails() {
 
 /** Web app GET — returns today's events as JSON to the front-end. */
 function doGet() {
-  return jsonResponse(getTodayEvents());
+  try {
+    return jsonResponse(getTodayEvents());
+  } catch (err) {
+    Logger.log('doGet error: ' + err.message);
+    return jsonResponse({ error: err.message });
+  }
 }
 
 /** Web app POST — saves user star ratings and feedback back to the sheet. */
@@ -234,7 +240,9 @@ Use the extract_event tool. If no clear event is present, still return a result 
 // ─── Google Sheet helpers ─────────────────────────────────────────────────────
 
 function getOrCreateSheet() {
-  const ss    = SpreadsheetApp.getActiveSpreadsheet();
+  const ss    = SPREADSHEET_ID
+    ? SpreadsheetApp.openById(SPREADSHEET_ID)
+    : SpreadsheetApp.getActiveSpreadsheet();
   let sheet   = ss.getSheetByName(SHEET_NAME);
 
   if (!sheet) {
