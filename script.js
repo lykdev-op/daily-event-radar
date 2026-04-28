@@ -2,7 +2,7 @@
 
 // Replace APPS_SCRIPT_URL with your deployed web app URL from:
 // Apps Script editor → Deploy → New deployment → Web app → Copy URL
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyqTYtrhCLzsibNQcVA9q3J3COR3Dg_ph8hSeyI0aiOC0h4SFjr1y46irTPbblHlKU3Rg/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxEMl0f96KEs0-4jgVfzhdSKJKa1Nx-6MKBza4E3WdmCf8QG_8O-eRbn-G8wyPTSsqKww/exec';
 
 const API = {
   getEvents:     APPS_SCRIPT_URL,           // GET  → doGet()
@@ -47,9 +47,7 @@ async function loadEvents() {
   let events;
 
   try {
-    const res = await fetch(API.getEvents, { redirect: 'follow' });
-    if (!res.ok) throw new Error(`Server returned ${res.status}`);
-    events = await res.json();
+    events = await fetchJsonp(API.getEvents);
   } catch (err) {
     showError('Could not load today\'s events. Check your connection and try again.');
     return;
@@ -259,6 +257,27 @@ function showConfirmation() {
   hide($submitSect);
   show($confirm);
   window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ─── JSONP (bypasses CORS on Google Apps Script redirects) ───────────────────
+
+function fetchJsonp(url) {
+  return new Promise((resolve, reject) => {
+    const name = 'cb_' + Date.now();
+    const script = document.createElement('script');
+    script.src = url + '?callback=' + name;
+    window[name] = (data) => {
+      delete window[name];
+      script.remove();
+      resolve(data);
+    };
+    script.onerror = () => {
+      delete window[name];
+      script.remove();
+      reject(new Error('Failed to reach the server.'));
+    };
+    document.head.appendChild(script);
+  });
 }
 
 // ─── Utilities ────────────────────────────────────────────────────────────────

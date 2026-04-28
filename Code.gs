@@ -3,7 +3,6 @@
 // Google Sheet. Set CLAUDE_API_KEY in Project Settings > Script Properties.
 
 const SHEET_NAME = 'Events';
-const SPREADSHEET_ID = '';   // ← paste your Google Sheet ID here (from its URL)
 const OPENAI_MODEL = 'gpt-4o';
 const GMAIL_SEARCH_DAYS = 1;   // how many days back to scan for forwarded emails
 const MAX_EVENTS_SHOWN = 5;    // top N events to surface to the UI each day
@@ -74,10 +73,17 @@ function fetchAndProcessEmails() {
   refreshShownTodayFlags(sheet);
 }
 
-/** Web app GET — returns today's events as JSON to the front-end. */
-function doGet() {
+/** Web app GET — returns today's events as JSON (or JSONP) to the front-end. */
+function doGet(e) {
   try {
-    return jsonResponse(getTodayEvents());
+    const data = getTodayEvents();
+    const callback = e && e.parameter && e.parameter.callback;
+    if (callback) {
+      return ContentService
+        .createTextOutput(callback + '(' + JSON.stringify(data) + ')')
+        .setMimeType(ContentService.MimeType.JAVASCRIPT);
+    }
+    return jsonResponse(data);
   } catch (err) {
     Logger.log('doGet error: ' + err.message);
     return jsonResponse({ error: err.message });
@@ -240,9 +246,7 @@ Use the extract_event tool. If no clear event is present, still return a result 
 // ─── Google Sheet helpers ─────────────────────────────────────────────────────
 
 function getOrCreateSheet() {
-  const ss    = SPREADSHEET_ID
-    ? SpreadsheetApp.openById(SPREADSHEET_ID)
-    : SpreadsheetApp.getActiveSpreadsheet();
+  const ss    = SpreadsheetApp.getActiveSpreadsheet();
   let sheet   = ss.getSheetByName(SHEET_NAME);
 
   if (!sheet) {
